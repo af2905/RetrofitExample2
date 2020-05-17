@@ -8,5 +8,7 @@
     <color name="colorPrimaryLightPlus">#BECBDC</color>
     <color name="colorPinkLight">#FCC7C3</color>
     <color name="colorSilver">#C0C0C0</color>
+    <color name="colorBeige">#F5F5DC</color>
+    <color name="colorGainsboro">#DCDCDC</color>
 
 </resources>
