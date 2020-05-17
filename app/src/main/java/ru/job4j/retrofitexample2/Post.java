@@ -23,6 +23,10 @@ class Post {
         this.text = text;
     }
 
+    void setText(String text) {
+        this.text = text;
+    }
+
     int getUserId() {
         return userId;
     }

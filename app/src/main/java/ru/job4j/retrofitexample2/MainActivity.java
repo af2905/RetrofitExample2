@@ -2,7 +2,6 @@ package ru.job4j.retrofitexample2;
 
 import android.os.Bundle;
 import android.view.View;
-import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -23,31 +22,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private PostAdapter adapter;
     private JsonPlaceHolderApi jsonPlaceHolderApi;
     private TextInputEditText text;
-    private TextView result;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.posts);
+        initViewsAndSetClickListeners();
+        jsonPlaceHolderApi = JsonPlaceHolderApi.RETROFIT.create(JsonPlaceHolderApi.class);
+        initRecycler();
+    }
+
+    void initViewsAndSetClickListeners() {
         text = findViewById(R.id.post_edit_text);
         MaterialButton send = findViewById(R.id.post_send);
         send.setOnClickListener(this);
-        // result = findViewById(R.id.result);
-        jsonPlaceHolderApi = JsonPlaceHolderApi.RETROFIT.create(JsonPlaceHolderApi.class);
+    }
+
+    void initRecycler() {
         recycler = findViewById(R.id.recycler);
         recycler.setLayoutManager(new LinearLayoutManager(this));
-        RecyclerView.ItemDecoration decoration = new DividerItemDecoration(16);
-        recycler.addItemDecoration(decoration);
+        recycler.addItemDecoration(new DividerItemDecoration(8, 16));
         adapter = new PostAdapter(jsonPlaceHolderApi);
         recycler.setAdapter(adapter);
-
-       /* createPost(100, "title1", "text1");
-        createPostFormUrlEncoded(2, "title2", "text2");
-        createPostMap();
-        putPost(1, "newTitle1", "newText1");
-        deletePost(2);
-        getPost(3);
-        updatePost(100, "changed", null);*/
     }
 
     void createPost(int userId, String title, String text) {
@@ -80,75 +76,31 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         createPostBasicMethod(call);
     }
 
-    void updatePost(int userId, final String title, final String text) {
-        Call<Post> call = jsonPlaceHolderApi.getPost(userId);
-        call.enqueue(new Callback<Post>() {
-            @Override
-            public void onResponse(Call<Post> call, Response<Post> response) {
-                if (response.isSuccessful()) {
-                    Post postResponse = response.body();
-                    String updateTitle, updateText;
-                    if (title != null) {
-                        updateTitle = title;
-                    } else {
-                        updateTitle = postResponse.getTitle();
-                    }
-                    if (text != null) {
-                        updateText = text;
-                    } else {
-                        updateText = postResponse.getText();
-                    }
-                    String content = String.format(
-                            "ID: %s \nuser ID: %s \nTitle: %s \nText: %s \n\n",
-                            postResponse.getId(), postResponse.getUserId(),
-                            updateTitle, updateText);
-                    result.append(content);
-                }
-
-            }
-
-            @Override
-            public void onFailure(Call<Post> call, Throwable t) {
-
-            }
-        });
-    }
-
     void createPostBasicMethod(Call<Post> call) {
         call.enqueue(new Callback<Post>() {
             @Override
             public void onResponse(Call<Post> call, Response<Post> response) {
                 if (response.isSuccessful()) {
                     Post postResponse = response.body();
-                    /*String content = String.format(
-                            "ID: %s \nuser ID: %s \nTitle: %s \nText: %s \n\n",
-                            postResponse.getId(), postResponse.getUserId(),
-                            postResponse.getTitle(), postResponse.getText()
-                    );*/
-                    //result.append(content);
-                    String content = String.format(
-                            "ID: %s \nuser ID: %s \nTitle: %s \nText: %s \n\n",
-                            postResponse.getId(), postResponse.getUserId(),
-                            postResponse.getTitle(), postResponse.getText()
-                    );
-                    Integer id = postResponse.getId();
-                    int userId = postResponse.getUserId();
-                    String title = postResponse.getTitle();
-                    String text = postResponse.getText();
-                    adapter.addPost(new Post(id, userId, title, text));
+                    adapter.addPost(new Post(
+                            postResponse.getId(),
+                            postResponse.getUserId(),
+                            postResponse.getTitle(),
+                            Utils.appendSpaces(postResponse.getText())));
+                    recycler.smoothScrollToPosition(recycler.getBottom());
                 }
             }
 
             @Override
             public void onFailure(Call<Post> call, Throwable t) {
-
+                adapter.addPost(new Post(1, 1, "", t.getMessage()));
             }
         });
     }
 
     @Override
     public void onClick(View v) {
-        createPost(1, "new post", text.getText().toString());
-        text.setText("");
+        createPost(1, "new post", text.getText().toString().trim());
+        text.setText(null);
     }
 }

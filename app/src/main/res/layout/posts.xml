@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -19,28 +20,36 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recycler"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent"
+                tools:listitem="@layout/post_template" />
 
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="16dp">
+            android:background="@color/colorBackground"
+            android:orientation="horizontal">
 
             <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1">
+                android:layout_marginStart="16dp"
+                android:layout_marginBottom="8dp"
+                android:layout_weight="1"
+                app:boxCornerRadiusBottomEnd="36dp"
+                app:boxCornerRadiusBottomStart="36dp"
+                app:boxCornerRadiusTopEnd="36dp"
+                app:boxCornerRadiusTopStart="36dp"
+                app:boxStrokeColor="@color/colorSilver">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/post_edit_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textPersonName"
-                    android:textColor="?attr/colorPrimaryDark" />
+                    android:textColor="@android:color/black" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -49,9 +58,10 @@
                 style="@style/Widget.MaterialComponents.Button.TextButton.Dialog"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:icon="@drawable/ic_send_accent_24dp"
-                app:iconGravity="textEnd" />
-
+                android:layout_gravity="center"
+                app:icon="@drawable/ic_send_green_36dp"
+                app:iconGravity="start"
+                app:iconTint="@color/colorPrimaryLight" />
         </LinearLayout>
 
     </LinearLayout>
