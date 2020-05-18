@@ -3,8 +3,6 @@ package ru.job4j.retrofitexample2;
 import java.util.Map;
 
 import retrofit2.Call;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.Field;
@@ -44,8 +42,8 @@ public interface JsonPlaceHolderApi {
     @DELETE("posts/{id}")
     Call<Void> deletePost(@Path("id") int id);
 
-    Retrofit RETROFIT = new Retrofit.Builder()
+    /*Retrofit RETROFIT = new Retrofit.Builder()
             .baseUrl("https://jsonplaceholder.typicode.com/")
             .addConverterFactory(GsonConverterFactory.create())
-            .build();
+            .build();*/
 }

@@ -15,6 +15,6 @@ class Utils {
     }
 
     static String appendSpaces(String text) {
-        return text.concat("     ");
+        return text.concat("    ");
     }
 }

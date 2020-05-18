@@ -2,6 +2,7 @@ package ru.job4j.retrofitexample2;
 
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -13,9 +14,13 @@ import com.google.android.material.textfield.TextInputEditText;
 import java.util.HashMap;
 import java.util.Map;
 
+import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private RecyclerView recycler;
@@ -28,7 +33,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.posts);
         initViewsAndSetClickListeners();
-        jsonPlaceHolderApi = JsonPlaceHolderApi.RETROFIT.create(JsonPlaceHolderApi.class);
+        initRetrofit();
         initRecycler();
     }
 
@@ -36,6 +41,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         text = findViewById(R.id.post_edit_text);
         MaterialButton send = findViewById(R.id.post_send);
         send.setOnClickListener(this);
+    }
+
+    void initRetrofit() {
+        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+        OkHttpClient.Builder client = new OkHttpClient.Builder();
+        if (BuildConfig.DEBUG) {
+            interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+        } else {
+            interceptor.setLevel(HttpLoggingInterceptor.Level.BASIC);
+        }
+        client.addInterceptor(interceptor);
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://jsonplaceholder.typicode.com/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(client.build())
+                .build();
+        jsonPlaceHolderApi = retrofit.create(JsonPlaceHolderApi.class);
     }
 
     void initRecycler() {
@@ -88,12 +111,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             postResponse.getTitle(),
                             Utils.appendSpaces(postResponse.getText())));
                     recycler.smoothScrollToPosition(recycler.getBottom());
+                } else {
+                    Toast.makeText(MainActivity.this,
+                            String.format("Error. Response status: %s", response.code()),
+                            Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<Post> call, Throwable t) {
-                adapter.addPost(new Post(1, 1, "", t.getMessage()));
+                Toast.makeText(MainActivity.this,
+                        String.format("Error. Response status: %s", t.getMessage()),
+                        Toast.LENGTH_SHORT).show();
             }
         });
     }

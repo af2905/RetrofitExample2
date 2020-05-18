@@ -23,10 +23,6 @@ class Post {
         this.text = text;
     }
 
-    void setText(String text) {
-        this.text = text;
-    }
-
     int getUserId() {
         return userId;
     }
@@ -41,5 +37,21 @@ class Post {
 
     String getText() {
         return text;
+    }
+
+    void setText(String text) {
+        this.text = text;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 }

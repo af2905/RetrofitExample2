@@ -1,11 +1,13 @@
 package ru.job4j.retrofitexample2;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
@@ -23,7 +25,6 @@ public class PostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private List<Post> posts = new ArrayList<>();
     private JsonPlaceHolderApi jsonPlaceHolderApi;
     private boolean isButtonDelete = true;
-    private static final String TAG = "log";
 
     PostAdapter(JsonPlaceHolderApi jsonPlaceHolderApi) {
         this.jsonPlaceHolderApi = jsonPlaceHolderApi;
@@ -81,16 +82,11 @@ public class PostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             @Override
             public void onClick(View v) {
                 if (isButtonDelete) {
-                    deletePost(post.getId(), holder.getLayoutPosition());
+                    deletePost(holder.itemView.getContext(), post.getId(), holder.getLayoutPosition());
                 } else {
-                    post.setText(postViewHolder.postText.getText().toString().trim());
-                    updatePost(post.getId(), post.getUserId(), post.getTitle(),
-                            Utils.appendSpaces(post.getText()), holder.getLayoutPosition());
-                    isButtonDelete = true;
-                    postViewHolder.postText.setEnabled(false);
-                    postViewHolder.postEditImg.setVisibility(View.VISIBLE);
-                    postViewHolder.postText.setCursorVisible(false);
-                    postViewHolder.postDeleteImg.setImageResource(R.drawable.ic_cancel_gray_24dp);
+                    post.setText(Utils.appendSpaces(postViewHolder.postText.getText().toString().trim()));
+                    updatePost(holder.itemView.getContext(), postViewHolder,
+                            post, holder.getLayoutPosition());
                 }
 
             }
@@ -114,44 +110,54 @@ public class PostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     }
 
 
-    private void deletePost(int id, final int position) {
+    private void deletePost(final Context context, int id, final int position) {
         Call<Void> call = jsonPlaceHolderApi.deletePost(id);
         call.enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {
                     removePostAt(position);
+                } else {
+                    Toast.makeText(context.getApplicationContext(),
+                            String.format("Error. Response status: %s", response.code()),
+                            Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
-
+                Toast.makeText(context.getApplicationContext(),
+                        String.format("Error. Response status: %s", t.getMessage()),
+                        Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    private void updatePost(final int id, final int userId, final String title,
-                            final String text, final int position) {
-        Call<Post> call = jsonPlaceHolderApi.getPost(id);
+    private void updatePost(final Context context, final PostViewHolder postViewHolder,
+                            final Post post, final int position) {
+        Call<Post> call = jsonPlaceHolderApi.updatePost(post.getId(), post);
         call.enqueue(new Callback<Post>() {
             @Override
             public void onResponse(Call<Post> call, Response<Post> response) {
                 if (response.isSuccessful()) {
-                    Post postResponse = response.body();
-                    String updateText;
-                    if (text != null) {
-                        updateText = text;
-                    } else {
-                        updateText = postResponse.getText();
-                    }
-                    updatePostAt(position, new Post(id, userId, title, updateText));
+                    isButtonDelete = true;
+                    postViewHolder.postText.setEnabled(false);
+                    postViewHolder.postEditImg.setVisibility(View.VISIBLE);
+                    postViewHolder.postText.setCursorVisible(false);
+                    postViewHolder.postDeleteImg.setImageResource(R.drawable.ic_cancel_gray_24dp);
+                    updatePostAt(position, post);
+                } else {
+                    Toast.makeText(context.getApplicationContext(),
+                            String.format("Error. Response status: %s", response.code()),
+                            Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<Post> call, Throwable t) {
-
+                Toast.makeText(context.getApplicationContext(),
+                        String.format("Error. Response status: %s", t.getMessage()),
+                        Toast.LENGTH_SHORT).show();
             }
         });
     }
