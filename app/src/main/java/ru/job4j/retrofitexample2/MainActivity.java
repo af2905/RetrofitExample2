@@ -1,5 +1,6 @@
 package ru.job4j.retrofitexample2;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
@@ -11,10 +12,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -53,10 +57,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         client.addInterceptor(interceptor);
 
+        OkHttpClient clientErrorIntercept = new OkHttpClient.Builder()
+                .addInterceptor(new Interceptor() {
+                    @Override
+                    public okhttp3.Response intercept(Chain chain) throws IOException {
+                        Request request = chain.request();
+                        okhttp3.Response response = chain.proceed(request);
+                        if (response.code() >= 400 && response.code() <= 599) {
+                            Intent intent = new Intent(
+                                    MainActivity.this, ErrorActivity.class);
+                            startActivity(intent);
+                            return response;
+                        }
+                        return response;
+                    }
+                })
+                .build();
+
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://jsonplaceholder.typicode.com/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(client.build())
+                .client(clientErrorIntercept)
                 .build();
         jsonPlaceHolderApi = retrofit.create(JsonPlaceHolderApi.class);
     }

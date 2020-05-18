@@ -40,10 +40,6 @@ public interface JsonPlaceHolderApi {
     Call<Post> updatePost(@Path("id") int id, @Body Post post);
 
     @DELETE("posts/{id}")
-    Call<Void> deletePost(@Path("id") int id);
+    Call<Post> deletePost(@Path("id") int id);
 
-    /*Retrofit RETROFIT = new Retrofit.Builder()
-            .baseUrl("https://jsonplaceholder.typicode.com/")
-            .addConverterFactory(GsonConverterFactory.create())
-            .build();*/
 }

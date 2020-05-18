@@ -111,10 +111,10 @@ public class PostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
 
     private void deletePost(final Context context, int id, final int position) {
-        Call<Void> call = jsonPlaceHolderApi.deletePost(id);
-        call.enqueue(new Callback<Void>() {
+        Call<Post> call = jsonPlaceHolderApi.deletePost(id);
+        call.enqueue(new Callback<Post>() {
             @Override
-            public void onResponse(Call<Void> call, Response<Void> response) {
+            public void onResponse(Call<Post> call, Response<Post> response) {
                 if (response.isSuccessful()) {
                     removePostAt(position);
                 } else {
@@ -125,7 +125,7 @@ public class PostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             }
 
             @Override
-            public void onFailure(Call<Void> call, Throwable t) {
+            public void onFailure(Call<Post> call, Throwable t) {
                 Toast.makeText(context.getApplicationContext(),
                         String.format("Error. Response status: %s", t.getMessage()),
                         Toast.LENGTH_SHORT).show();
